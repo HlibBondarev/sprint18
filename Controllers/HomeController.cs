@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TaskAuthenticationAuthorization.Models;
+using TaskAuthenticationAuthorization.ViewModels;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
