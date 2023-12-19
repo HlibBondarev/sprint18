@@ -65,6 +65,8 @@ namespace TaskAuthenticationAuthorization
                 //                    (
                 //                         new List<BuyerType> { BuyerType.Golden, BuyerType.Wholesale }))
                 //                    );
+
+                opts.AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
             });
         }
 
