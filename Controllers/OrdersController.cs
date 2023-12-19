@@ -48,8 +48,8 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "ID", "ID");
-            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "ID", "ID");
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id");
+            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "SuperMarketId", "SuperMarketId");
             return View();
         }
 
@@ -66,8 +66,8 @@ namespace TaskAuthenticationAuthorization.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "ID", "ID", order.CustomerId);
-            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "ID", "ID", order.SuperMarketId);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", order.CustomerId);
+            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "SuperMarketId", "SuperMarketId", order.SuperMarketId);
             return View(order);
         }
 
@@ -84,8 +84,8 @@ namespace TaskAuthenticationAuthorization.Controllers
             {
                 return NotFound();
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "ID", "ID", order.CustomerId);
-            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "ID", "ID", order.SuperMarketId);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", order.CustomerId);
+            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "SuperMarketId", "SuperMarketId", order.SuperMarketId);
             return View(order);
         }
 
@@ -121,8 +121,8 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "ID", "ID", order.CustomerId);
-            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "ID", "ID", order.SuperMarketId);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", order.CustomerId);
+            ViewData["SuperMarketId"] = new SelectList(_context.SuperMarkets, "SuperMarketId", "SuperMarketId", order.SuperMarketId);
             return View(order);
         }
 
