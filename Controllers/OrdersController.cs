@@ -11,7 +11,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public class OrdersController : Controller
     {
         private readonly ShoppingContext _context;
@@ -20,7 +20,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         {
             _context = context;
         }
-
+        [AllowAnonymous]
         // GET: Orders
         public async Task<IActionResult> Index()
         {
@@ -34,11 +34,12 @@ namespace TaskAuthenticationAuthorization.Controllers
                                                     .Where(c => c.Customer.UserId == userId);
                 return View(await shoppingContext.ToListAsync());
             }
-            else 
+            else if (User.HasClaim(ClaimsIdentity.DefaultRoleClaimType, "admin"))
             {
                 var shoppingContext = _context.Orders.Include(o => o.Customer).Include(o => o.SuperMarket);
                 return View(await shoppingContext.ToListAsync());
             }
+            return NotFound();
         }
 
         // GET: Orders/Details/5
@@ -72,7 +73,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(order);
         }
 
-        [Authorize(Policy ="AdminOnly")]
         // GET: Orders/Create
         public IActionResult Create()
         {
@@ -81,7 +81,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View();
         }
 
-        [Authorize(Policy ="AdminOnly")]
         // POST: Orders/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -100,7 +99,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(order);
         }
 
-        [Authorize(Policy ="AdminOnly")]
         // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -119,7 +117,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(order);
         }
 
-        [Authorize(Policy ="AdminOnly")]
         // POST: Orders/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -157,7 +154,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(order);
         }
 
-        [Authorize(Policy ="AdminOnly")]
         // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -178,7 +174,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(order);
         }
 
-        [Authorize(Policy ="AdminOnly")]
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

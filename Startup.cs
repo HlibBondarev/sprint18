@@ -50,10 +50,6 @@ namespace TaskAuthenticationAuthorization
                 //          policy.RequireClaim("Email"));
                 //});
 
-                //opts.AddPolicy("OnlyForAdmin", policy =>
-                //{
-                //    policy.RequireRole("admin");
-                //});
 
                 //opts.AddPolicy("OnlyForBuyerType", policy => {
                 //    policy.RequireClaim("TypeOfByer", Enum.GetNames(typeof(BuyerType)));
