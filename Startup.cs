@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,7 +34,13 @@ namespace TaskAuthenticationAuthorization
             services.AddDbContext<ShoppingContext>(options => options.UseSqlServer(connection));
             services.AddControllersWithViews();
 
-            services.AddTransient<IAuthorizationHandler, BuyerTypeHandler>();
+			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+				.AddCookie(options => //CookieAuthenticationOptions
+				{
+					options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+				});
+
+			services.AddTransient<IAuthorizationHandler, BuyerTypeHandler>();
 
             services.AddAuthorization(opts =>
             {
@@ -48,22 +55,16 @@ namespace TaskAuthenticationAuthorization
                 //    policy.RequireRole("admin");
                 //});
 
-                opts.AddPolicy("OnlyForBuyerType", policy => {
-                    policy.RequireClaim("TypeOfByer", Enum.GetNames(typeof(BuyerType)));
-                });
+                //opts.AddPolicy("OnlyForBuyerType", policy => {
+                //    policy.RequireClaim("TypeOfByer", Enum.GetNames(typeof(BuyerType)));
+                //});
 
-                opts.AddPolicy("OnlyForBuyerType_are_Golden_and_Wholesale",
-                    policy => policy.Requirements
-                                    .Add(new BuyerTypeRequirement
-                                    (
-                                         new List<BuyerType> { BuyerType.Golden, BuyerType.Wholesale }))
-                                    );
-
-
-
-                //opts.AddPolicy("OnlyOwnBuyerOrders",
+                //opts.AddPolicy("OnlyForBuyerType_are_Golden_and_Wholesale",
                 //    policy => policy.Requirements
-                //                    .Add(new OwnBuyerOrderRequirement(Con)));
+                //                    .Add(new BuyerTypeRequirement
+                //                    (
+                //                         new List<BuyerType> { BuyerType.Golden, BuyerType.Wholesale }))
+                //                    );
             });
         }
 
@@ -85,9 +86,10 @@ namespace TaskAuthenticationAuthorization
 
             app.UseRouting();
 
-            app.UseAuthorization();
+			app.UseAuthentication();
+			app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+			app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
