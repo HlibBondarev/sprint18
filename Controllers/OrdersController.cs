@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly ShoppingContext _context;
@@ -21,8 +24,21 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var shoppingContext = _context.Orders.Include(o => o.Customer).Include(o => o.SuperMarket);
-            return View(await shoppingContext.ToListAsync());
+            if (User.HasClaim(ClaimsIdentity.DefaultRoleClaimType, "buyer"))
+            {
+                string email = User.FindFirst(ClaimsIdentity.DefaultNameClaimType).Value;
+                int userId = _context.Users.FirstOrDefault(u => u.Email == email).Id;
+                var shoppingContext = _context.Orders
+                                                    .Include(o => o.Customer)
+                                                    .Include(o => o.SuperMarket)
+                                                    .Where(c => c.Customer.UserId == userId);
+                return View(await shoppingContext.ToListAsync());
+            }
+            else 
+            {
+                var shoppingContext = _context.Orders.Include(o => o.Customer).Include(o => o.SuperMarket);
+                return View(await shoppingContext.ToListAsync());
+            }
         }
 
         // GET: Orders/Details/5
