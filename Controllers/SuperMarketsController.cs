@@ -10,7 +10,9 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
+    //OR:
+    //[Authorize(Roles = "admin")]
     public class SuperMarketsController : Controller
     {
         private readonly ShoppingContext _context;
@@ -46,8 +48,8 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(superMarket);
         }
 
-        // GET: SuperMarkets/Create
-        public IActionResult Create()
+		// GET: SuperMarkets/Create
+		public IActionResult Create()
         {
             return View();
         }
@@ -57,7 +59,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Address")] SuperMarket superMarket)
+        public async Task<IActionResult> Create([Bind("SuperMarketId,Name,Address")] SuperMarket superMarket)
         {
             if (ModelState.IsValid)
             {
@@ -89,7 +91,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Address")] SuperMarket superMarket)
+        public async Task<IActionResult> Edit(int id, [Bind("SuperMarketId,Name,Address")] SuperMarket superMarket)
         {
             if (id != superMarket.SuperMarketId)
             {
