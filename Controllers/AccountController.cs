@@ -51,7 +51,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                     return RedirectToAction("Index", "Home");
                 }
                 else
-                    ModelState.AddModelError("", "Incorrect login and/or password");
+                    ModelState.AddModelError("", "This email is already taken");
             }
             return View(model);
         }
