@@ -10,7 +10,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public class ProductsController : Controller
     {
         private readonly ShoppingContext _context;
