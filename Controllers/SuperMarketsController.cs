@@ -33,7 +33,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var superMarket = await _context.SuperMarkets
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.SuperMarketId == id);
             if (superMarket == null)
             {
                 return NotFound();
@@ -87,7 +87,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Address")] SuperMarket superMarket)
         {
-            if (id != superMarket.ID)
+            if (id != superMarket.SuperMarketId)
             {
                 return NotFound();
             }
@@ -101,7 +101,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SuperMarketExists(superMarket.ID))
+                    if (!SuperMarketExists(superMarket.SuperMarketId))
                     {
                         return NotFound();
                     }
@@ -124,7 +124,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var superMarket = await _context.SuperMarkets
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.SuperMarketId == id);
             if (superMarket == null)
             {
                 return NotFound();
@@ -146,7 +146,7 @@ namespace TaskAuthenticationAuthorization.Controllers
 
         private bool SuperMarketExists(int id)
         {
-            return _context.SuperMarkets.Any(e => e.ID == id);
+            return _context.SuperMarkets.Any(e => e.SuperMarketId == id);
         }
     }
 }

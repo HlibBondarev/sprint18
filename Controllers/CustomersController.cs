@@ -61,7 +61,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
             {
                 return NotFound();
@@ -115,7 +115,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,LastName,FirstName,Address,Discount")] Customer customer)
         {
-            if (id != customer.ID)
+            if (id != customer.Id)
             {
                 return NotFound();
             }
@@ -129,7 +129,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.ID))
+                    if (!CustomerExists(customer.Id))
                     {
                         return NotFound();
                     }
@@ -152,7 +152,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (customer == null)
             {
                 return NotFound();
@@ -174,7 +174,7 @@ namespace TaskAuthenticationAuthorization.Controllers
 
         private bool CustomerExists(int id)
         {
-            return _context.Customers.Any(e => e.ID == id);
+            return _context.Customers.Any(e => e.Id == id);
         }
     }
 }

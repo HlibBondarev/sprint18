@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection.Metadata;
 
 namespace TaskAuthenticationAuthorization.Models
 {
@@ -8,12 +9,13 @@ namespace TaskAuthenticationAuthorization.Models
     }
     public class User
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public BuyerType? TypeOfByer { get; set; } = BuyerType.None;
+        public BuyerType TypeOfBuyer { get; set; } = BuyerType.None;
 
-        public int? RoleId { get; set; }
+        public Customer? Customer { get; set; }
+        public int RoleId { get; set; }
         public Role Role { get; set; }
     }
 }

@@ -32,66 +32,6 @@ namespace TaskAuthenticationAuthorization
                     }
                 );
             context.SaveChanges();
-            context.Customers.AddRange(
-                    new Customer
-                    {
-                        FirstName = "Ostap",
-                        LastName = "Bender",
-                        Address = "Rio de Zhmerinka",
-                        Discount = Discount.O,
-                    },
-                    new Customer
-                    {
-                        FirstName = "Shura",
-                        LastName = "Balaganov",
-                        Address = "Odessa",
-                        Discount = Discount.R,
-                    },
-                    new Customer
-                    {
-                        FirstName = "Mikhail",
-                        LastName = "Panikovsky",
-                        Address = "Kyiv",
-                        Discount = Discount.V,
-                    }
-                );
-            context.SaveChanges();
-
-            context.Users.AddRange(
-                    new User
-                    {
-                        Email = "mail_1@gmail.com",
-                        Password = "1",
-                        TypeOfByer = BuyerType.Golden,
-                        RoleId = 0
-                    },
-                    new User
-                    {
-                        Email = "mail_2@gmail.com",
-                        Password = "2",
-                        TypeOfByer = BuyerType.Golden,
-                        RoleId = 1
-                    },
-                    new User
-                    {
-                        Email = "mail_3@gmail.com",
-                        Password = "3",
-                        TypeOfByer = BuyerType.None,
-                        RoleId = 0
-                    }
-                );
-            context.SaveChanges();
-
-            context.Roles.AddRange(
-                    new Role
-                    {
-                        Name = "admin"
-                    },
-                    new Role
-                    {
-                        Name = "buyer"
-                    }
-                );
 
             context.SuperMarkets.AddRange(
                     new SuperMarket
@@ -106,6 +46,72 @@ namespace TaskAuthenticationAuthorization
                     }
                 );
             context.SaveChanges();
+
+            context.Roles.AddRange(
+                    new Role
+                    {
+                        Name = "admin"
+                    },
+                    new Role
+                    {
+                        Name = "buyer"
+                    }
+                );
+            context.SaveChanges();
+
+            context.Users.AddRange(
+                    new User
+                    {
+                        Email = "mail_1@gmail.com",
+                        Password = "1",
+                        TypeOfBuyer = BuyerType.Golden,
+                        RoleId = 1
+                    },
+                    new User
+                    {
+                        Email = "mail_2@gmail.com",
+                        Password = "2",
+                        TypeOfBuyer = BuyerType.Golden,
+                        RoleId = 2
+                    },
+                    new User
+                    {
+                        Email = "mail_3@gmail.com",
+                        Password = "3",
+                        TypeOfBuyer = BuyerType.None,
+                        RoleId = 2
+                    }
+                );
+            context.SaveChanges();
+
+            context.Customers.AddRange(
+                    new Customer
+                    {
+                        UserId = 1,
+                        FirstName = "Ostap",
+                        LastName = "Bender",
+                        Address = "Rio de Zhmerinka",
+                        Discount = Discount.O,
+                    },
+                    new Customer
+                    {
+                        UserId = 2,
+                        FirstName = "Shura",
+                        LastName = "Balaganov",
+                        Address = "Odessa",
+                        Discount = Discount.R,
+                    },
+                    new Customer
+                    {
+                        UserId = 3,
+                        FirstName = "Mikhail",
+                        LastName = "Panikovsky",
+                        Address = "Kyiv",
+                        Discount = Discount.V,
+                    }
+                );
+            context.SaveChanges();
+
             context.Orders.AddRange(
                     new Order
                     {
@@ -113,14 +119,15 @@ namespace TaskAuthenticationAuthorization
                         SuperMarketId = 1,
                         OrderDate = DateTime.Now,
                     },
-                        new Order
-                        {
-                            CustomerId = 1,
-                            SuperMarketId = 1,
-                            OrderDate = DateTime.Now,
-                        }
+                    new Order
+                    {
+                        CustomerId = 1,
+                        SuperMarketId = 1,
+                        OrderDate = DateTime.Now,
+                    }
                 );
             context.SaveChanges();
+
             context.OrderDetails.AddRange(
                     new OrderDetail
                     {
@@ -128,12 +135,12 @@ namespace TaskAuthenticationAuthorization
                         ProductId = 1,
                         Quantity = 2
                     },
-                        new OrderDetail
-                        {
-                            OrderId = 2,
-                            ProductId = 2,
-                            Quantity = 1
-                        }
+                    new OrderDetail
+                    {
+                        OrderId = 2,
+                        ProductId = 2,
+                        Quantity = 1
+                    }
                 );
             context.SaveChanges();
         }
