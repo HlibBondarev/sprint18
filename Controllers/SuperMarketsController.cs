@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
+    [Authorize]
     public class SuperMarketsController : Controller
     {
         private readonly ShoppingContext _context;
@@ -18,12 +20,14 @@ namespace TaskAuthenticationAuthorization.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         // GET: SuperMarkets
         public async Task<IActionResult> Index()
         {
             return View(await _context.SuperMarkets.ToListAsync());
         }
 
+        [AllowAnonymous]
         // GET: SuperMarkets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
