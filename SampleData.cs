@@ -115,13 +115,13 @@ namespace TaskAuthenticationAuthorization
             context.Orders.AddRange(
                     new Order
                     {
-                        CustomerId = 1,
+                        CustomerId = 2,
                         SuperMarketId = 1,
                         OrderDate = DateTime.Now,
                     },
                     new Order
                     {
-                        CustomerId = 1,
+                        CustomerId = 2,
                         SuperMarketId = 1,
                         OrderDate = DateTime.Now,
                     }
