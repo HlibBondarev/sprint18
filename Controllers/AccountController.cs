@@ -40,7 +40,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                         Password = model.Password,
                         TypeOfBuyer = model.TypeOfByer
                     };
-                    Role userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "user");
+                    Role userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
                     if (userRole != null)
                         user.Role = userRole;
                     _context.Users.Add(user);
@@ -59,6 +59,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            //var t=User.Identity.IsAuthenticated;
             return View();
         }
 
@@ -82,13 +83,29 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
+        }
+
         private async Task Authenticate(User user)
         {
-            var claims = new List<Claim>
+			//var claims = new List<Claim>
+			//{
+			//	new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+			//};
+			//// создаем объект ClaimsIdentity
+			//ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+			//// установка аутентификационных куки
+			//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+
+			var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name),
-                new Claim("TypeOfByer", user.TypeOfBuyer.ToString())
+                //new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name),
+                //new Claim("TypeOfByer", user.TypeOfBuyer.ToString())
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType,
                         ClaimsIdentity.DefaultRoleClaimType);
