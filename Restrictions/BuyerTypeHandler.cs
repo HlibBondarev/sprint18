@@ -15,7 +15,7 @@ namespace TaskAuthenticationAuthorization.Restrictions
             {
                 context.Succeed(requirement);
             }
-            Claim claim = context.User.FindFirst("RestrictionForBuyerType");
+            Claim claim = context.User.FindFirst("OnlyForBuyerType_are_Golden_and_Wholesale");
             if (claim != null)
             {
                 if(requirement.BuyerTypes.Any(bt=> bt.ToString()== claim?.Value))
