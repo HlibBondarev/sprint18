@@ -76,8 +76,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Customers/Create
         public IActionResult Create()
         {
-            ViewBag.TypeOfBuyer = new SelectList(Enum.GetValues(typeof(BuyerType)));
-            ViewBag.Discount = new SelectList(Enum.GetValues(typeof(Discount)));
+            
 
             return View();
         }
