@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TaskAuthenticationAuthorization.Models;
-using TaskAuthenticationAuthorization.ViewModels;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
@@ -20,7 +18,6 @@ namespace TaskAuthenticationAuthorization.Controllers
             _logger = logger;
         }
 
-        [Authorize]
         public IActionResult Index()
         {
             return View();

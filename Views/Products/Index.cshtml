@@ -18,10 +18,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Price)
             </th>
-            @if (User.IsInRole("admin"))
-            {
-                <th></th>
-            }
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -33,14 +30,11 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
-            @if (User.IsInRole("admin"))
-            {
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-                </td>
-            }
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
         </tr>
 }
     </tbody>

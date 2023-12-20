@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +9,6 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
-    [Authorize(Policy = "AdminOnly")]
-    //OR:
-    //[Authorize(Roles = "admin")]
     public class SuperMarketsController : Controller
     {
         private readonly ShoppingContext _context;
@@ -22,14 +18,12 @@ namespace TaskAuthenticationAuthorization.Controllers
             _context = context;
         }
 
-        [AllowAnonymous]
         // GET: SuperMarkets
         public async Task<IActionResult> Index()
         {
             return View(await _context.SuperMarkets.ToListAsync());
         }
 
-        [AllowAnonymous]
         // GET: SuperMarkets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -39,7 +33,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var superMarket = await _context.SuperMarkets
-                .FirstOrDefaultAsync(m => m.SuperMarketId == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (superMarket == null)
             {
                 return NotFound();
@@ -48,8 +42,8 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View(superMarket);
         }
 
-		// GET: SuperMarkets/Create
-		public IActionResult Create()
+        // GET: SuperMarkets/Create
+        public IActionResult Create()
         {
             return View();
         }
@@ -59,7 +53,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SuperMarketId,Name,Address")] SuperMarket superMarket)
+        public async Task<IActionResult> Create([Bind("ID,Name,Address")] SuperMarket superMarket)
         {
             if (ModelState.IsValid)
             {
@@ -91,9 +85,9 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SuperMarketId,Name,Address")] SuperMarket superMarket)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Address")] SuperMarket superMarket)
         {
-            if (id != superMarket.SuperMarketId)
+            if (id != superMarket.ID)
             {
                 return NotFound();
             }
@@ -107,7 +101,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SuperMarketExists(superMarket.SuperMarketId))
+                    if (!SuperMarketExists(superMarket.ID))
                     {
                         return NotFound();
                     }
@@ -130,7 +124,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var superMarket = await _context.SuperMarkets
-                .FirstOrDefaultAsync(m => m.SuperMarketId == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (superMarket == null)
             {
                 return NotFound();
@@ -152,7 +146,7 @@ namespace TaskAuthenticationAuthorization.Controllers
 
         private bool SuperMarketExists(int id)
         {
-            return _context.SuperMarkets.Any(e => e.SuperMarketId == id);
+            return _context.SuperMarkets.Any(e => e.ID == id);
         }
     }
 }

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TaskAuthenticationAuthorization.Models;
 
-namespace TaskAuthenticationAuthorization.ViewModels
+namespace TaskAuthenticationAuthorization.Models
 {
     public class IndexViewModel
     {

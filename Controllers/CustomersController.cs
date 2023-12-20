@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TaskAuthenticationAuthorization.Models;
-using TaskAuthenticationAuthorization.ViewModels;
 
 namespace TaskAuthenticationAuthorization.Controllers
 {
-    [Authorize(Policy = "AdminOnly")]
     public class CustomersController : Controller
     {
         private readonly ShoppingContext _context;
@@ -64,7 +61,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (customer == null)
             {
                 return NotFound();
@@ -76,9 +73,6 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Customers/Create
         public IActionResult Create()
         {
-            ViewBag.TypeOfBuyer = new SelectList(Enum.GetValues(typeof(BuyerType)));
-            ViewBag.Discount = new SelectList(Enum.GetValues(typeof(Discount)));
-
             return View();
         }
 
@@ -87,32 +81,11 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(/*[Bind("Id,UserId,LastName,FirstName,Address,Discount")]*/ CustomerViewModel customer)
+        public async Task<IActionResult> Create([Bind("ID,LastName,FirstName,Address,Discount")] Customer customer)
         {
             if (ModelState.IsValid)
             {
-                var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
-                User user = new User
-                {
-                    Email = customer.Email,
-                    Password = customer.Password,
-                    TypeOfBuyer= BuyerType.None
-                };
-                Role userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
-                if (userRole != null)
-                    user.Role = userRole;
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-
-                Customer c = new Customer
-                {
-                    UserId=user.Id,
-                    LastName = customer.LastName,
-                    FirstName = customer.FirstName,
-                    Address = customer.Address,
-                    Discount = customer.Discount,
-                };
-                _context.Add(c);
+                _context.Add(customer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -140,9 +113,9 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,LastName,FirstName,Address,Discount")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,LastName,FirstName,Address,Discount")] Customer customer)
         {
-            if (id != customer.Id)
+            if (id != customer.ID)
             {
                 return NotFound();
             }
@@ -156,7 +129,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.Id))
+                    if (!CustomerExists(customer.ID))
                     {
                         return NotFound();
                     }
@@ -179,7 +152,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (customer == null)
             {
                 return NotFound();
@@ -201,7 +174,7 @@ namespace TaskAuthenticationAuthorization.Controllers
 
         private bool CustomerExists(int id)
         {
-            return _context.Customers.Any(e => e.Id == id);
+            return _context.Customers.Any(e => e.ID == id);
         }
     }
 }
