@@ -38,7 +38,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                     {
                         Email = model.Email,
                         Password = model.Password,
-                        TypeOfBuyer = model.TypeOfByer
+                        TypeOfBuyer = BuyerType.Regular
                     };
                     Role userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
                     if (userRole != null)
@@ -59,7 +59,6 @@ namespace TaskAuthenticationAuthorization.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            //var t=User.Identity.IsAuthenticated;
             return View();
         }
 
@@ -92,15 +91,6 @@ namespace TaskAuthenticationAuthorization.Controllers
 
         private async Task Authenticate(User user)
         {
-			//var claims = new List<Claim>
-			//{
-			//	new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-			//};
-			//// создаем объект ClaimsIdentity
-			//ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-			//// установка аутентификационных куки
-			//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-
 			var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),

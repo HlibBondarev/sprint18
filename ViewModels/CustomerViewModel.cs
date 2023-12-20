@@ -3,8 +3,14 @@ using TaskAuthenticationAuthorization.Models;
 
 namespace TaskAuthenticationAuthorization.ViewModels
 {
-    public class RegisterModel
+    public class CustomerViewModel
     {
+
+        [Display (Name ="Last name")]
+        public string LastName { get; set; }
+        [Display(Name = "First name")]
+        public string FirstName { get; set; }
+
         [Required(ErrorMessage = "Email not specified")]
         public string Email { get; set; }
 
@@ -16,7 +22,10 @@ namespace TaskAuthenticationAuthorization.ViewModels
         [Compare("Password", ErrorMessage = "Password entered incorrectly")]
         public string ConfirmPassword { get; set; }
 
-        [Display(Name ="Buyer type")]
-        public BuyerType TypeOfByer { get; set; } = BuyerType.Regular;
+        [Display(Name = "Buyer type")]
+        public BuyerType TypeOfBuyer { get; set; } = BuyerType.None;
+
+        public string Address { get; set; }
+        public Discount? Discount { get; set; }
     }
 }
