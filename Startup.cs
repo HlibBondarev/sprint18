@@ -42,6 +42,7 @@ namespace TaskAuthenticationAuthorization
 
 			services.AddTransient<IAuthorizationHandler, BuyerTypeHandler>();
 
+     
 			services.AddAuthorization(opts =>
 			{
 				//8.Every buyer receives claim "buyerType" with possible values: "none", "regular", "golden", "wholesale".

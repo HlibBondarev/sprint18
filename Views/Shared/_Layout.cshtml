@@ -41,6 +41,16 @@
 						</li>
 						@if (User.Identity.IsAuthenticated)
 						{
+							var isAdmin = User.IsInRole("admin");
+							<li class="nav-item">
+							@if (isAdmin)
+							{
+							<a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
+							}
+							</li>
+						}
+						@if (User.Identity.IsAuthenticated)
+						{
 							<li class="nav-item">
 								<form method="post" asp-controller="Account" asp-action="Logout" aspcontroller="Logout">
 									<input type="submit" value="Logout" />
