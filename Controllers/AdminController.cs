@@ -1,30 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TaskAuthenticationAuthorization.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace TaskAuthenticationAuthorization.Controllers
+namespace TaskAuthenticationAuthorization.Models
 {
     [Authorize(Policy = "AdminOnly")]
-    public class ProductsController : Controller
+    public class AdminController : Controller
     {
         private readonly ShoppingContext _context;
 
-        public ProductsController(ShoppingContext context)
+        public AdminController(ShoppingContext context)
         {
             _context = context;
         }
 
-        [AllowAnonymous]
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
         [AllowAnonymous]
@@ -36,14 +34,14 @@ namespace TaskAuthenticationAuthorization.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (product == null)
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(user);
         }
 
         // GET: Products/Create
@@ -52,23 +50,19 @@ namespace TaskAuthenticationAuthorization.Controllers
             return View();
         }
 
-        // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Email,TypeOfBuyer,RoleId")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(user);
         }
 
-        // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,12 +70,29 @@ namespace TaskAuthenticationAuthorization.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(product);
+            ViewBag.Roles = _context.Roles
+                     .Select(role => new SelectListItem
+                     {
+                         Text = role.Name,
+                         Value = role.RoleId.ToString(),
+                         Selected = user.Role != null && role.RoleId == user.RoleId
+                     })
+                     .ToList();
+            ViewBag.BuyerTypes = Enum.GetValues(typeof(BuyerType))
+                         .Cast<BuyerType>()
+                         .Select(v => new SelectListItem
+                         {
+                             Text = v.ToString(),
+                             Value = v.ToString(),
+                             Selected = v == user.TypeOfBuyer
+                         })
+                         .ToList();
+            return View(user);
         }
 
         // POST: Products/Edit/5
@@ -89,9 +100,9 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Price")] Product product)
+        public async Task<IActionResult> Edit(int id, User user)
         {
-            if (id != product.ID)
+            if (id != user.Id)
             {
                 return NotFound();
             }
@@ -100,12 +111,16 @@ namespace TaskAuthenticationAuthorization.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    var existingUser = _context.Users.Find(id);
+                    existingUser.RoleId = user.RoleId;
+                    existingUser.Email = user.Email;
+                    existingUser.TypeOfBuyer = user.TypeOfBuyer;
+                    _context.Update(existingUser);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.ID))
+                    if (!ProductExists(user.Id))
                     {
                         return NotFound();
                     }
@@ -116,7 +131,7 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(user);
         }
 
         // GET: Products/Delete/5
@@ -127,30 +142,29 @@ namespace TaskAuthenticationAuthorization.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (product == null)
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(user);
         }
 
-        // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            _context.Products.Remove(product);
+            var user = await _context.Users.FindAsync(id);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Products.Any(e => e.ID == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
