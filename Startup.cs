@@ -44,22 +44,23 @@ namespace TaskAuthenticationAuthorization
 
             services.AddAuthorization(opts =>
             {
-                // 8. Every buyer receives claim "buyerType" with possible values: "none", "regular", "golden", "wholesale".
-                //opts.AddPolicy("RestrictionForBuyerType",
+                //services.AddAuthorization(options =>
+                //{
+                //    options.AddPolicy("OnlyForUser", policy =>
+                //          policy.RequireClaim("Email"));
+                //});
+
+
+                //opts.AddPolicy("OnlyForBuyerType", policy => {
+                //    policy.RequireClaim("TypeOfByer", Enum.GetNames(typeof(BuyerType)));
+                //});
+
+                //opts.AddPolicy("OnlyForBuyerType_are_Golden_and_Wholesale",
                 //    policy => policy.Requirements
                 //                    .Add(new BuyerTypeRequirement
                 //                    (
-                //                         new List<BuyerType> { BuyerType.None, BuyerType.Regular, BuyerType.Golden, BuyerType.Wholesale }))
+                //                         new List<BuyerType> { BuyerType.Golden, BuyerType.Wholesale }))
                 //                    );
-
-                // The same policy only other parameters
-                // 9. Only buyers with "golden", "wholesale" claim values have access to Discount page (My Discount tab in the main menu)
-                opts.AddPolicy("RestrictionForBuyerType",
-                    policy => policy.Requirements
-                                    .Add(new BuyerTypeRequirement
-                                    (
-                                         new List<BuyerType> { BuyerType.Golden, BuyerType.Wholesale }))
-                                    );
 
                 opts.AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimsIdentity.DefaultRoleClaimType, "admin"));
             });
