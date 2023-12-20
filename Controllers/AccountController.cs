@@ -95,7 +95,8 @@ namespace TaskAuthenticationAuthorization.Controllers
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name),
-                //new Claim("TypeOfByer", user.TypeOfBuyer.ToString())
+                new Claim("TypeOfBuyer", user.TypeOfBuyer.ToString()),
+                new Claim("RestrictionForBuyerType", user.TypeOfBuyer.ToString())
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType,
                         ClaimsIdentity.DefaultRoleClaimType);
