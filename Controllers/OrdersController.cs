@@ -21,6 +21,7 @@ namespace TaskAuthenticationAuthorization.Controllers
             _context = context;
         }
         [AllowAnonymous]
+        //[Authorize(Policy = "RestrictionForBuyerType")]
         // GET: Orders
         public async Task<IActionResult> Index()
         {
