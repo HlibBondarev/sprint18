@@ -22,7 +22,7 @@ namespace TaskAuthenticationAuthorization.Models
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            return View(await _context.Users.Include(r => r.Role).ToListAsync());
         }
 
         [AllowAnonymous]
@@ -35,7 +35,8 @@ namespace TaskAuthenticationAuthorization.Models
             }
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
+                                     .Include(r => r.Role)
+                                     .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
                 return NotFound();
@@ -47,6 +48,9 @@ namespace TaskAuthenticationAuthorization.Models
         // GET: Products/Create
         public IActionResult Create()
         {
+            ViewBag.BuyerTypes = FillViewBagForTypeOfBuyer(BuyerType.None);
+            ViewBag.Roles = FillViewBagForRoles(_context.Roles.First(r => r.Name == "buyer").RoleId);
+
             return View();
         }
 
@@ -56,10 +60,22 @@ namespace TaskAuthenticationAuthorization.Models
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                User chekUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+                if (chekUser == null)
+                {
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError("Email", "This email is already taken");
+                }
             }
+
+            ViewBag.BuyerTypes = FillViewBagForTypeOfBuyer(user.TypeOfBuyer);
+            ViewBag.Roles = FillViewBagForRoles(user.RoleId);
+
             return View(user);
         }
 
@@ -75,23 +91,10 @@ namespace TaskAuthenticationAuthorization.Models
             {
                 return NotFound();
             }
-            ViewBag.Roles = _context.Roles
-                     .Select(role => new SelectListItem
-                     {
-                         Text = role.Name,
-                         Value = role.RoleId.ToString(),
-                         Selected = user.Role != null && role.RoleId == user.RoleId
-                     })
-                     .ToList();
-            ViewBag.BuyerTypes = Enum.GetValues(typeof(BuyerType))
-                         .Cast<BuyerType>()
-                         .Select(v => new SelectListItem
-                         {
-                             Text = v.ToString(),
-                             Value = v.ToString(),
-                             Selected = v == user.TypeOfBuyer
-                         })
-                         .ToList();
+
+            ViewBag.BuyerTypes = FillViewBagForTypeOfBuyer(user.TypeOfBuyer);
+            ViewBag.Roles = FillViewBagForRoles(user.RoleId);
+
             return View(user);
         }
 
@@ -111,12 +114,30 @@ namespace TaskAuthenticationAuthorization.Models
             {
                 try
                 {
-                    var existingUser = _context.Users.Find(id);
-                    existingUser.RoleId = user.RoleId;
-                    existingUser.Email = user.Email;
-                    existingUser.TypeOfBuyer = user.TypeOfBuyer;
-                    _context.Update(existingUser);
-                    await _context.SaveChangesAsync();
+                    var users = _context.Users.Where(u => u.Email == user.Email);
+                    bool idValid = false;
+                    if (users.Count() == 0)
+                    {
+                        idValid = true;
+                    }
+                    else if (users.Count() == 1 & users.First().Id == id)
+                    {
+                        idValid = true;
+                    }
+                    if (idValid)
+                    {
+                        var existingUser = await _context.Users.FindAsync(id);
+                        existingUser.RoleId = user.RoleId;
+                        existingUser.Email = user.Email;
+                        existingUser.TypeOfBuyer = user.TypeOfBuyer;
+                        _context.Update(existingUser);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Email", "This email is already taken");
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -129,8 +150,10 @@ namespace TaskAuthenticationAuthorization.Models
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+            ViewBag.BuyerTypes = FillViewBagForTypeOfBuyer(user.TypeOfBuyer);
+            ViewBag.Roles = FillViewBagForRoles(user.RoleId);
+
             return View(user);
         }
 
@@ -162,9 +185,34 @@ namespace TaskAuthenticationAuthorization.Models
             return RedirectToAction(nameof(Index));
         }
 
+
         private bool ProductExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+
+        private dynamic FillViewBagForTypeOfBuyer(BuyerType buyerType)
+        {
+            return Enum.GetValues(typeof(BuyerType))
+                       .Cast<BuyerType>()
+                       .Select(v => new SelectListItem
+                       {
+                           Text = v.ToString(),
+                           Value = v.ToString(),
+                           Selected = v == buyerType
+                       })
+                       .ToList();
+        }
+        private dynamic FillViewBagForRoles(int id)
+        {
+            return _context.Roles
+                           .Select(role => new SelectListItem
+                           {
+                               Text = role.Name,
+                               Value = role.RoleId.ToString(),
+                               Selected = role.RoleId == id
+                           })
+                           .ToList();
         }
     }
 }

@@ -5,21 +5,26 @@ using System.Reflection.Metadata;
 
 namespace TaskAuthenticationAuthorization.Models
 {
-	public enum BuyerType
-	{
-		None, Regular, Golden, Wholesale
-	}
+    public enum BuyerType
+    {
+        None, Regular, Golden, Wholesale
+    }
 
-	[Index(nameof(Email), IsUnique = true)]
-	public class User
-	{
-		public int Id { get; set; }
-		public string Email { get; set; }
-		public string Password { get; set; }
-		public BuyerType TypeOfBuyer { get; set; } = BuyerType.None;
+    [Index(nameof(Email), IsUnique = true)]
+    public class User
+    {
+        public int Id { get; set; }
+        public int RoleId { get; set; }
 
-		public Customer? Customer { get; set; }
-		public int RoleId { get; set; }
-		public Role Role { get; set; }
-	}
+        [Required]
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+
+        [Display(Name = "Buyer type")]
+        public BuyerType TypeOfBuyer { get; set; } = BuyerType.None;
+
+        public Role Role { get; set; }
+        public Customer? Customer { get; set; }
+    }
 }

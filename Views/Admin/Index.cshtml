@@ -4,7 +4,7 @@
     ViewData["Title"] = "Admin";
 }
 
-<h1>Orders</h1>
+<h1>Admin</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -19,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.TypeOfBuyer)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RoleId)
+                @Html.DisplayNameFor(model => model.Role.Name)
             </th>
             <th></th>
         </tr>
@@ -35,7 +35,7 @@
                 @Html.DisplayFor(modelItem => item.TypeOfBuyer)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RoleId)
+                    @Html.DisplayFor(modelItem => item.Role.Name)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
