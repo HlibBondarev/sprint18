@@ -24,7 +24,7 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Customers
         public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
-           
+
             ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["AddressSortParam"] = sortOrder == "Address" ? "address_desc" : "Address";
             ViewData["CurrentFilter"] = searchString;
@@ -49,10 +49,12 @@ namespace TaskAuthenticationAuthorization.Controllers
                 default:
                     customers = customers.OrderBy(s => s.LastName);
                     break;
-
             }
 
-            return View(await customers.AsNoTracking().ToListAsync());
+            var shoppingContext = customers.Include(c => c.User)
+                                           .ThenInclude(u => u.Role);
+
+            return View(await shoppingContext.AsNoTracking().ToListAsync());
         }
 
         // GET: Customers/Details/5
@@ -76,7 +78,8 @@ namespace TaskAuthenticationAuthorization.Controllers
         // GET: Customers/Create
         public IActionResult Create()
         {
-            
+            ViewBag.Discount = FillViewBagForDiscount(Discount.R);
+            ViewBag.TypeOfBuyer = FillViewBagForTypeOfBuyer(BuyerType.Regular);
 
             return View();
         }
@@ -86,37 +89,50 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(/*[Bind("Id,UserId,LastName,FirstName,Address,Discount")]*/ CustomerViewModel customer)
+        public async Task<IActionResult> Create(CustomerViewModel customer)
         {
             if (ModelState.IsValid)
             {
-                var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
-                User user = new User
+                User chekUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == customer.Email);
+                if (chekUser == null)
                 {
-                    Email = customer.Email,
-                    Password = customer.Password,
-                    TypeOfBuyer= BuyerType.None
-                };
-                Role userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
-                if (userRole != null)
-                    user.Role = userRole;
-                _context.Add(user);
-                await _context.SaveChangesAsync();
+                    User user = new User
+                    {
+                        Email = customer.Email,
+                        Password = customer.Password,
+                        TypeOfBuyer = customer.TypeOfBuyer
+                    };
 
-                Customer c = new Customer
+                    Role userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "buyer");
+                    if (userRole != null)
+                        user.Role = userRole;
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+
+                    Customer newCustomer = new Customer
+                    {
+                        UserId = user.Id,
+                        LastName = customer.LastName,
+                        FirstName = customer.FirstName,
+                        Address = customer.Address,
+                        Discount = customer.Discount,
+                    };
+                    _context.Add(newCustomer);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
                 {
-                    UserId=user.Id,
-                    LastName = customer.LastName,
-                    FirstName = customer.FirstName,
-                    Address = customer.Address,
-                    Discount = customer.Discount,
-                };
-                _context.Add(c);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    ModelState.AddModelError("Email", "This email is already taken");
+                }
             }
+            ViewBag.Discount = FillViewBagForDiscount(customer.Discount);
+            ViewBag.TypeOfBuyer = FillViewBagForTypeOfBuyer(customer.TypeOfBuyer);
+
             return View(customer);
         }
+
+
 
         // GET: Customers/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -131,7 +147,23 @@ namespace TaskAuthenticationAuthorization.Controllers
             {
                 return NotFound();
             }
-            return View(customer);
+
+            User chekUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == customer.UserId);
+
+            CustomerViewModel editedCustomer = new CustomerViewModel
+            {
+                LastName = customer.LastName,
+                FirstName = customer.FirstName,
+                Email = chekUser.Email,
+                Address = customer.Address,
+                TypeOfBuyer = chekUser.TypeOfBuyer,
+                Discount = customer.Discount
+            };
+
+            ViewBag.Discount = FillViewBagForDiscount(editedCustomer.Discount);
+            ViewBag.TypeOfBuyer = FillViewBagForTypeOfBuyer(editedCustomer.TypeOfBuyer);
+
+            return View(editedCustomer);
         }
 
         // POST: Customers/Edit/5
@@ -139,23 +171,35 @@ namespace TaskAuthenticationAuthorization.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,LastName,FirstName,Address,Discount")] Customer customer)
+        public async Task<IActionResult> Edit(int id, CustomerViewModel customer)
         {
-            if (id != customer.Id)
+            Customer editedCustomer = await _context.Customers.FirstOrDefaultAsync(u => u.Id == id);
+            if (editedCustomer is null)
             {
                 return NotFound();
             }
+
+            ModelState.Remove("Email");     // This will remove the key 
+            ModelState.Remove("Password");  // This will remove the key 
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(customer);
+                    User editedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == customer.Email);
+                    editedUser.TypeOfBuyer = customer.TypeOfBuyer;
+                    _context.Update(editedUser);
+
+                    editedCustomer.FirstName = customer.FirstName;
+                    editedCustomer.LastName = customer.LastName;
+                    editedCustomer.Address = customer.Address;
+                    editedCustomer.Discount = customer.Discount;
+                    _context.Update(editedCustomer);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.Id))
+                    if (!CustomerExists(id))
                     {
                         return NotFound();
                     }
@@ -166,6 +210,10 @@ namespace TaskAuthenticationAuthorization.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Discount = FillViewBagForDiscount(customer.Discount);
+            ViewBag.TypeOfBuyer = FillViewBagForTypeOfBuyer(customer.TypeOfBuyer);
+
             return View(customer);
         }
 
@@ -201,6 +249,33 @@ namespace TaskAuthenticationAuthorization.Controllers
         private bool CustomerExists(int id)
         {
             return _context.Customers.Any(e => e.Id == id);
+        }
+
+        private dynamic FillViewBagForDiscount(Discount? discount)
+        {
+
+            return Enum.GetValues(typeof(Discount))
+                        .Cast<Discount>()
+                        .Select(v => new SelectListItem
+                        {
+                            Text = v.ToString(),
+                            Value = v.ToString(),
+                            Selected = v == (discount ?? Discount.R)
+                        })
+                        .ToList();
+
+        }
+        private dynamic FillViewBagForTypeOfBuyer(BuyerType buyerType)
+        {
+            return Enum.GetValues(typeof(BuyerType))
+                       .Cast<BuyerType>()
+                       .Select(v => new SelectListItem
+                       {
+                           Text = v.ToString(),
+                           Value = v.ToString(),
+                           Selected = v == buyerType
+                       })
+                       .ToList();
         }
     }
 }
